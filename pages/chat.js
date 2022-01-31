@@ -1,21 +1,42 @@
 import { Box, Text, TextField, Image, Button } from '@skynexui/components';
 import React from 'react';
 import appConfig from '../config.json';
+import { createClient } from '@supabase/supabase-js'
+
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoiYW5vbiIsImlhdCI6MTY0MzY0NjA5MSwiZXhwIjoxOTU5MjIyMDkxfQ.IIRBrKQMQv-keOvdHhBIhqDqKEF_MZzAJUo4KS2p4K0'
+const SUPABASE_URL = 'https://srvrwriathznufjthvww.supabase.co'
+const supabaseClient = createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
+
 
 export default function ChatPage() {
     // Sua lógica vai aqui
     const [mensagem, setMensagem] = React.useState('')
     const [listaDeMensagem, setListaDeMensagem] = React.useState([])
 
+    React.useEffect(()=>{
+        supabaseClient
+            .from('mensagens')
+            .select('*')
+            .order('id', {ascending:false})
+            .then(({ data })=>{
+                setListaDeMensagem(data)
+    })
+    }, [])
 
     // ./Sua lógica vai aqui
     function handleNovaMensagem(novaMensagem) {
         const mensagem = {
-            id: listaDeMensagem.length + 1,
-            de: 'viniciusdiniz',
+            de: 'viniciusdiniz21',
             texto: novaMensagem
         }
-        setListaDeMensagem([mensagem,...listaDeMensagem])
+
+        supabaseClient
+            .from('mensagens')
+            .insert([mensagem])
+            .then(({ data })=>{
+                setListaDeMensagem([data[0],...listaDeMensagem])
+            })
+
         setMensagem('')
     }
 
@@ -179,7 +200,7 @@ function MessageList(props) {
                                     display: 'inline-block',
                                     marginRight: '8px',
                                 }}
-                                src={`https://github.com/viniciusdiniz21.png`}
+                                src={`https://github.com/${mensagem.de}.png`}
                             />
                             <Text tag="strong">
                                 {mensagem.de}
@@ -199,13 +220,13 @@ function MessageList(props) {
                             colorVariant='neutral'
                             styleSheet={{
                                 fontSize: '10px',
-                                marginLeft: '170vh',
+                                marginLeft: '90%',
                                 backgroundColor: 'grey',
                                 color: 'red',
                             }}
-                            onClick={(mensagem)=>{
+                            /* onClick={(mensagem)=>{
                                 
-                            }}
+                            }} */
                             >
                 
                             </Button>
